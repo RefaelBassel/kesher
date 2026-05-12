@@ -8,6 +8,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Providers } from '@/app/providers';
 import { SwRegister } from '@/components/sw-register';
+import { InstallPrompt } from '@/components/install-prompt';
 import { locales, getDirection, type Locale } from '@/lib/i18n/config';
 import { cn } from '@/lib/utils';
 
@@ -100,6 +101,7 @@ export default async function LocaleLayout({
             <main className="min-h-[calc(100vh-4rem)]">{children}</main>
             <Footer />
             <SwRegister />
+            <InstallPrompt />
           </Providers>
         </NextIntlClientProvider>
       </body>

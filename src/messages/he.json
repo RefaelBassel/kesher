@@ -210,5 +210,13 @@
     "tagline": "Kesher — מחבר את הקהילה היהודית בוורשה אל ההזדמנויות היהודיות בעולם.",
     "built_by": "נבנה על ידי",
     "rights": "כל הזכויות שמורות."
+  },
+  "install": {
+    "title": "התקינו את Kesher כאפליקציה",
+    "android_subtitle": "התקנה מהירה — גישה ישירה מהמסך הבית, גם ללא דפדפן.",
+    "install_button": "התקן",
+    "ios_step1": "הקישו על",
+    "ios_step2": "גללו ובחרו",
+    "ios_step3": "Add to Home Screen"
   }
 }

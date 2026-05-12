@@ -210,5 +210,13 @@
     "tagline": "Kesher — łączy warszawską społeczność żydowską z żydowskimi programami z całego świata.",
     "built_by": "Stworzone przez",
     "rights": "Wszelkie prawa zastrzeżone."
+  },
+  "install": {
+    "title": "Zainstaluj Kesher jako aplikację",
+    "android_subtitle": "Szybka instalacja — uruchamiaj Kesher jak zwykłą aplikację, bez przeglądarki.",
+    "install_button": "Zainstaluj",
+    "ios_step1": "Stuknij",
+    "ios_step2": "Przewiń i wybierz",
+    "ios_step3": "Add to Home Screen"
   }
 }

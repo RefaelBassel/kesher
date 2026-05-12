@@ -210,5 +210,13 @@
     "tagline": "Kesher — connecting the Warsaw Jewish community to the world's Jewish opportunities.",
     "built_by": "Built by",
     "rights": "All rights reserved."
+  },
+  "install": {
+    "title": "Install Kesher as an app",
+    "android_subtitle": "Quick install — launch Kesher like a regular app, no browser needed.",
+    "install_button": "Install",
+    "ios_step1": "Tap",
+    "ios_step2": "Scroll and pick",
+    "ios_step3": "Add to Home Screen"
   }
 }
