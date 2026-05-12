@@ -28,6 +28,15 @@ async function main() {
     .toBuffer();
   await writeFile(path.join(out, 'icon-maskable-512.png'), maskBuf);
   console.log('wrote icon-maskable-512.png');
+
+  // Apple touch icon — 180x180 PNG with solid background (iOS strips transparency).
+  const apple = await sharp(svg)
+    .resize(180, 180)
+    .flatten({ background: { r: 30, g: 58, b: 95 } })
+    .png()
+    .toBuffer();
+  await writeFile(path.join(out, 'apple-touch-icon.png'), apple);
+  console.log('wrote apple-touch-icon.png');
 }
 
 main().catch((e) => {

@@ -51,7 +51,11 @@ export function LoginForm({ mode = 'signin' as 'signin' | 'signup' }) {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/${locale}/callback?next=${encodeURIComponent(redirectTo)}` },
+      options: {
+        redirectTo: `${window.location.origin}/${locale}/callback?next=${encodeURIComponent(redirectTo)}`,
+        // Force Google to show the account picker every time, even if the user is signed in.
+        queryParams: { prompt: 'select_account' },
+      },
     });
   }
 

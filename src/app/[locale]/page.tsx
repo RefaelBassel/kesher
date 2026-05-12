@@ -2,9 +2,9 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { Hero } from '@/components/hero';
 import { OpportunityGrid } from '@/components/opportunity-grid';
-import { createClient } from '@/lib/supabase/server';
+import { CategoryCard } from '@/components/category-card';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { ALL_CATEGORIES } from '@/types/domain';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import type { Locale } from '@/lib/i18n/config';
@@ -14,41 +14,65 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
   setRequestLocale(locale);
   const t = await getTranslations('home');
   const tCat = await getTranslations('categories');
-  const supabase = await createClient();
+  const tCatDesc = await getTranslations('categoryDescriptions');
 
-  const now = new Date().toISOString();
-  const sixWeeksLater = new Date(Date.now() + 6 * 7 * 86400_000).toISOString();
-  const oneWeekAgo = new Date(Date.now() - 7 * 86400_000).toISOString();
+  let closing: { data: any[] | null } = { data: [] };
+  let recommended: { data: any[] | null } = { data: [] };
+  let fresh: { data: any[] | null } = { data: [] };
 
-  const [closing, recommended, fresh] = await Promise.all([
-    supabase
-      .from('opportunities')
-      .select('*')
-      .eq('status', 'active')
-      .gte('deadline', now)
-      .lte('deadline', sixWeeksLater)
-      .order('deadline', { ascending: true })
-      .limit(6),
-    supabase
-      .from('opportunities')
-      .select('*')
-      .eq('status', 'active')
-      .eq('recommended', true)
-      .order('discovered_at', { ascending: false })
-      .limit(6),
-    supabase
-      .from('opportunities')
-      .select('*')
-      .eq('status', 'active')
-      .gte('discovered_at', oneWeekAgo)
-      .order('discovered_at', { ascending: false })
-      .limit(6),
-  ]);
+  if (isSupabaseConfigured()) {
+    const supabase = await createClient();
+    const now = new Date().toISOString();
+    const sixWeeksLater = new Date(Date.now() + 6 * 7 * 86400_000).toISOString();
+    const oneWeekAgo = new Date(Date.now() - 7 * 86400_000).toISOString();
+
+    try {
+      [closing, recommended, fresh] = await Promise.all([
+        supabase
+          .from('opportunities')
+          .select('*')
+          .eq('status', 'active')
+          .gte('deadline', now)
+          .lte('deadline', sixWeeksLater)
+          .order('deadline', { ascending: true })
+          .limit(6),
+        supabase
+          .from('opportunities')
+          .select('*')
+          .eq('status', 'active')
+          .eq('recommended', true)
+          .order('discovered_at', { ascending: false })
+          .limit(6),
+        supabase
+          .from('opportunities')
+          .select('*')
+          .eq('status', 'active')
+          .gte('discovered_at', oneWeekAgo)
+          .order('discovered_at', { ascending: false })
+          .limit(6),
+      ]);
+    } catch (e) {
+      console.warn('[home] Supabase query failed:', (e as Error).message);
+    }
+  }
+
+  const setupNeeded = !isSupabaseConfigured();
 
   return (
     <>
       <Hero />
       <div className="container space-y-16 py-12">
+        {setupNeeded && (
+          <div className="rounded-lg border-2 border-dashed border-brand-sand bg-brand-cream/50 p-6 text-center">
+            <p className="font-semibold text-brand-deep">
+              ⚙️ Connect Supabase to start showing opportunities
+            </p>
+            <p className="mt-2 text-sm text-brand-deep/70">
+              Fill in <code>.env.local</code> with your Supabase URL and keys, then restart the dev server.
+              See README.md for the full setup guide.
+            </p>
+          </div>
+        )}
         {!!closing.data?.length && (
           <Section title={`🔥 ${t('section_closing_soon')}`} href={`/${locale}/opportunities?sort=deadline`}>
             <OpportunityGrid items={closing.data} />
@@ -68,14 +92,18 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         )}
 
         <section className="space-y-6">
-          <h2 className="text-2xl font-bold">{t('section_browse_categories')}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          <h2 className="font-serif text-2xl font-bold tracking-tight md:text-3xl">
+            {t('section_browse_categories')}
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {ALL_CATEGORIES.map((cat) => (
-              <Link key={cat} href={`/${locale}/opportunities?category=${cat}`} className="group">
-                <Card className="flex h-32 items-center justify-center p-4 text-center transition hover:border-brand-deep hover:bg-brand-cream/50">
-                  <span className="font-medium">{tCat(cat)}</span>
-                </Card>
-              </Link>
+              <CategoryCard
+                key={cat}
+                category={cat}
+                href={`/${locale}/opportunities?category=${cat}`}
+                title={tCat(cat)}
+                description={tCatDesc(cat)}
+              />
             ))}
           </div>
         </section>

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
+import { TranslateMissingButton } from '@/components/admin/translate-missing-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export default async function AdminDashboard() {
   const supabase = createAdminClient();
 
   const oneWeekAgo = new Date(Date.now() - 7 * 86400_000).toISOString();
-  const [usersC, oppsC, scrapesC, pendingC, failingSources] = await Promise.all([
+  const [usersC, oppsC, scrapesC, pendingC, failingSources, missingTranslations] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
     supabase.from('opportunities').select('*', { count: 'exact', head: true }).eq('status', 'active'),
     supabase
@@ -20,6 +21,11 @@ export default async function AdminDashboard() {
       .gte('started_at', oneWeekAgo),
     supabase.from('source_suggestions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('sources').select('*').gte('consecutive_failures', 3).order('consecutive_failures', { ascending: false }),
+    supabase
+      .from('opportunities')
+      .select('*', { count: 'exact', head: true })
+      .or('title_he.is.null,title_pl.is.null')
+      .not('title_en', 'is', null),
   ]);
 
   return (
@@ -32,6 +38,20 @@ export default async function AdminDashboard() {
         <Stat label={t('stats_scrapes_week')} value={scrapesC.count ?? 0} />
         <Stat label={t('stats_pending_suggestions')} value={pendingC.count ?? 0} />
       </div>
+
+      {(missingTranslations.count ?? 0) > 0 && (
+        <Card className="flex flex-wrap items-center justify-between gap-3 border-brand-sand bg-brand-cream/50 p-4">
+          <div>
+            <p className="font-medium">
+              {missingTranslations.count} opportunities are missing Hebrew/Polish translations
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Run them through Gemini translation now (free, takes ~1 second per opportunity)
+            </p>
+          </div>
+          <TranslateMissingButton />
+        </Card>
+      )}
 
       {!!failingSources.data?.length && (
         <section className="space-y-3">

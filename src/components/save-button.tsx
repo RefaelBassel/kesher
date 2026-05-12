@@ -13,7 +13,8 @@ export function SaveButton({ opportunityId }: { opportunityId: string }) {
   useEffect(() => {
     const supabase = createClient();
     let mounted = true;
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const user = session?.user;
       if (!user) return mounted && setSaved(false);
       const { data } = await supabase
         .from('saved_opportunities')

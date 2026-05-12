@@ -16,7 +16,7 @@
     --secondary-foreground: 215 39% 18%;
     --muted: 36 22% 92%;
     --muted-foreground: 215 16% 47%;
-    --accent: 5 60% 47%;
+    --accent: 15 47% 53%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -39,7 +39,7 @@
     --secondary-foreground: 36 37% 97%;
     --muted: 215 28% 18%;
     --muted-foreground: 215 16% 65%;
-    --accent: 5 60% 47%;
+    --accent: 15 47% 53%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 36 37% 97%;
@@ -59,6 +59,11 @@
   }
   html[dir='rtl'] body {
     text-align: right;
+  }
+  /* Playfair has no Hebrew glyphs — swap font-serif for Heebo in Hebrew so titles render properly */
+  html[lang='he'] .font-serif {
+    font-family: var(--font-heebo), system-ui, sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 

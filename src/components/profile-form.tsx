@@ -45,26 +45,38 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
   async function save() {
     setBusy(true);
     setSaved(false);
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase
-      .from('profiles')
-      .update({
-        full_name: fullName || null,
-        age_range: ageRange as any,
-        locale: locale as any,
-        languages,
-        interests,
-        max_budget_usd: budget ? parseInt(budget, 10) : null,
-        scholarship_only: scholarshipOnly,
-        notify_email: notifyEmail,
-        notify_push: notifyPush,
-      })
-      .eq('id', user.id);
-    setBusy(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (!user) {
+        alert('Session expired — please sign in again.');
+        window.location.href = '/';
+        return;
+      }
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: fullName || null,
+          age_range: ageRange as any,
+          locale: locale as any,
+          languages,
+          interests,
+          max_budget_usd: budget ? parseInt(budget, 10) : null,
+          scholarship_only: scholarshipOnly,
+          notify_email: notifyEmail,
+          notify_push: notifyPush,
+        })
+        .eq('id', user.id);
+      if (error) {
+        alert('Failed to save: ' + error.message);
+        return;
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function deleteAccount() {

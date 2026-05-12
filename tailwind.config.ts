@@ -15,7 +15,7 @@ const config: Config = {
           deep: '#1e3a5f',
           sand: '#d4a574',
           cream: '#faf6f0',
-          accent: '#c4392f',
+          accent: '#c2664a',
           forest: '#2d5a3d',
         },
         border: 'hsl(var(--border))',

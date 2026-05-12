@@ -99,6 +99,18 @@
     "heritage-trip": "Heritage trip",
     "other": "Other"
   },
+  "categoryDescriptions": {
+    "long-term-program": "Multi-month immersive programs in Israel and beyond",
+    "short-term-program": "A few days to a few weeks of intensive learning",
+    "scholarship": "Financial support for Jewish education and trips",
+    "internship": "Paid or stipended work experience",
+    "seminar": "Focused workshops and educational gatherings",
+    "volunteering": "Give back through service projects worldwide",
+    "online-course": "Self-paced learning from anywhere",
+    "youth-exchange": "Cross-cultural programs connecting Jewish youth",
+    "heritage-trip": "Discover Jewish history and roots",
+    "other": "Programs that don't fit other categories"
+  },
   "interests": {
     "religious": "Religious learning",
     "academic": "Academic",
@@ -196,6 +208,7 @@
   },
   "footer": {
     "tagline": "Kesher — connecting the Warsaw Jewish community to the world's Jewish opportunities.",
+    "built_by": "Built by",
     "rights": "All rights reserved."
   }
 }

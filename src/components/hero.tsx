@@ -19,10 +19,16 @@ export function Hero() {
       />
       <div className="container relative z-10 flex flex-col items-start gap-6 py-20 md:py-28">
         <div className="space-y-4 max-w-2xl">
-          <h1 className="font-serif text-4xl font-bold leading-tight md:text-6xl">{t('hero_title')}</h1>
+          <h1 className="font-serif text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
+            {t('hero_title')}
+          </h1>
           <p className="text-lg text-brand-cream/85 md:text-xl">{t('hero_subtitle')}</p>
         </div>
-        <Button asChild size="lg" variant="accent">
+        <Button
+          asChild
+          size="lg"
+          className="bg-brand-sand text-brand-deep hover:bg-brand-sand/90 shadow-lg shadow-brand-sand/30"
+        >
           <Link href={`/${locale}/opportunities`}>
             {t('hero_cta')}
             <ArrowRight className="h-5 w-5 ltr:ml-2 rtl:mr-2 rtl:rotate-180" />

@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
-import { Bookmark, LogIn, User as UserIcon, Shield, Menu } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { Bookmark, LogIn, LogOut, User as UserIcon, Shield, Menu } from 'lucide-react';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import {
   Sheet,
@@ -19,27 +19,36 @@ export function Header() {
   const [user, setUser] = useState<{ email?: string; isAdmin?: boolean } | null>(null);
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) return;
     const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return setUser(null);
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .maybeSingle();
-      setUser({ email: data.user.email, isAdmin: profile?.role === 'admin' });
+    // getSession() reads from cookies without a network roundtrip — much more reliable in dev.
+    const loadFromSession = async (sessionUser: { id: string; email?: string } | null) => {
+      if (!sessionUser) return setUser(null);
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', sessionUser.id)
+          .maybeSingle();
+        setUser({ email: sessionUser.email, isAdmin: profile?.role === 'admin' });
+      } catch {
+        setUser({ email: sessionUser.email, isAdmin: false });
+      }
+    };
+    supabase.auth.getSession().then(({ data }) => {
+      loadFromSession(data.session?.user ?? null);
     });
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_, session) => {
-      if (!session?.user) return setUser(null);
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .maybeSingle();
-      setUser({ email: session.user.email, isAdmin: profile?.role === 'admin' });
+    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
+      loadFromSession(session?.user ?? null);
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = `/${locale}`;
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
@@ -47,10 +56,10 @@ export function Header() {
         <div className="flex items-center gap-6">
           <Link
             href={`/${locale}`}
-            className="flex items-center gap-2 text-lg font-bold text-brand-deep dark:text-brand-sand"
+            className="flex items-center gap-2 text-xl font-bold text-brand-deep dark:text-brand-sand"
           >
-            <span className="font-serif text-2xl">ק</span>
-            <span>Kesher</span>
+            <span className="font-serif text-3xl font-black leading-none">ק</span>
+            <span className="font-serif tracking-tight">Kesher</span>
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
             <NavLink href={`/${locale}`}>{t('home')}</NavLink>
@@ -68,10 +77,11 @@ export function Header() {
                   {t('saved')}
                 </Link>
               </Button>
-              <Button asChild variant="ghost" size="sm">
+              <Button asChild variant="ghost" size="sm" title={user.email}>
                 <Link href={`/${locale}/profile`}>
                   <UserIcon className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                  {t('profile')}
+                  <span className="hidden lg:inline">{user.email?.split('@')[0]}</span>
+                  <span className="lg:hidden">{t('profile')}</span>
                 </Link>
               </Button>
               {user.isAdmin && (
@@ -82,6 +92,10 @@ export function Header() {
                   </Link>
                 </Button>
               )}
+              <Button variant="ghost" size="sm" onClick={signOut} title={t('logout')}>
+                <LogOut className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+                {t('logout')}
+              </Button>
             </>
           ) : (
             <Button asChild size="sm">
@@ -106,9 +120,18 @@ export function Header() {
                 <NavLink href={`/${locale}/about`}>{t('about')}</NavLink>
                 {user ? (
                   <>
+                    {user.email && (
+                      <p className="px-3 py-2 text-xs text-muted-foreground truncate">{user.email}</p>
+                    )}
                     <NavLink href={`/${locale}/saved`}>{t('saved')}</NavLink>
                     <NavLink href={`/${locale}/profile`}>{t('profile')}</NavLink>
                     {user.isAdmin && <NavLink href={`/${locale}/admin`}>{t('admin')}</NavLink>}
+                    <button
+                      onClick={signOut}
+                      className="rounded-md px-3 py-2 text-start text-sm font-medium text-destructive transition hover:bg-accent"
+                    >
+                      {t('logout')}
+                    </button>
                   </>
                 ) : (
                   <NavLink href={`/${locale}/login`}>{t('login')}</NavLink>

@@ -99,6 +99,18 @@
     "heritage-trip": "Wyjazd dziedzictwa",
     "other": "Inne"
   },
+  "categoryDescriptions": {
+    "long-term-program": "Wielomiesięczne programy w Izraelu i za granicą",
+    "short-term-program": "Od kilku dni do kilku tygodni intensywnej nauki",
+    "scholarship": "Wsparcie finansowe na żydowską edukację i wyjazdy",
+    "internship": "Płatne staże i programy stypendialne",
+    "seminar": "Warsztaty i edukacyjne spotkania",
+    "volunteering": "Projekty społeczne i wolontariat na świecie",
+    "online-course": "Nauka we własnym tempie z dowolnego miejsca",
+    "youth-exchange": "Międzykulturowe programy dla młodzieży żydowskiej",
+    "heritage-trip": "Odkryj żydowską historię i korzenie",
+    "other": "Programy spoza pozostałych kategorii"
+  },
   "interests": {
     "religious": "Nauka religijna",
     "academic": "Akademicki",
@@ -196,6 +208,7 @@
   },
   "footer": {
     "tagline": "Kesher — łączy warszawską społeczność żydowską z żydowskimi programami z całego świata.",
+    "built_by": "Stworzone przez",
     "rights": "Wszelkie prawa zastrzeżone."
   }
 }

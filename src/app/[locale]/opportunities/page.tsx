@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { OpportunityGrid } from '@/components/opportunity-grid';
 import { FilterBar } from '@/components/filter-bar';
 import type { Locale } from '@/lib/i18n/config';
@@ -30,6 +30,17 @@ export default async function OpportunitiesPage({
   setRequestLocale(locale);
   const t = await getTranslations('nav');
   const sp = await searchParams;
+
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="container py-16 text-center">
+        <h1 className="text-2xl font-bold">{t('opportunities')}</h1>
+        <p className="mt-4 text-muted-foreground">
+          Supabase is not configured yet. Fill in <code>.env.local</code> and restart the dev server.
+        </p>
+      </div>
+    );
+  }
 
   const supabase = await createClient();
   let query = supabase.from('opportunities').select('*').eq('status', 'active');
