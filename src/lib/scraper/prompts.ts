@@ -84,11 +84,15 @@ Below is the HTML content of the page (cleaned). Extract ALL programs, scholarsh
 }
 
 RULES:
-1. Only extract concrete, actionable opportunities. Skip blog posts, general descriptions of the organization, news articles.
-2. If a field is not present, return null. Do NOT invent or guess.
-3. Resolve all relative URLs to absolute.
-4. For dates without a year, infer the next upcoming occurrence.
-5. Return valid JSON only — no markdown, no commentary.
+1. Only extract CURRENT or UPCOMING opportunities. Skip anything that already happened.
+   - If the title or description mentions a past year (e.g. "Summer 2017", "2020 cohort", "5783 program"), SKIP IT.
+   - Wording like "took place", "was held", "ended", "concluded", "applications closed" means past — SKIP.
+   - Today's reference date: ${new Date().toISOString().slice(0, 10)}. Any deadline before today = SKIP.
+2. Skip blog posts, general descriptions of the organization, news articles, FAQ items, staff bios, testimonials.
+3. If a field is not present, return null. Do NOT invent or guess.
+4. Resolve all relative URLs to absolute.
+5. For dates without a year, infer the next upcoming occurrence (always future, never past).
+6. Return valid JSON only — no markdown, no commentary.
 
 HTML CONTENT:
 \`\`\`html
